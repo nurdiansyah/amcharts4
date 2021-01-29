@@ -286,15 +286,21 @@ export function add(date: Date, unit: TimeUnit, count: number, utc?: boolean): D
  * @param unit             Time unit
  * @param count            Number of units to round to
  * @param firstDateOfWeek  First day of week
+ * @param roundMinutes     Minutes to round to (some timezones use non-whole hour)
+ * @param timezone         Use specific named timezone when rounding
  * @return New date
  */
-export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek?: number, utc?: boolean, firstDate?: Date): Date {
+export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek?: number, utc?: boolean, firstDate?: Date, roundMinutes: number = 0, timezone?: string): Date {
 
 	if (!$type.isNumber(count)) {
 		count = 1;
 	}
 
 	let timeZoneOffset = 0;
+
+	if (timezone && ["day", "month", "week", "year"].indexOf(unit) != -1) {
+		date = setTimezone(date, timezone);
+	}
 
 	if (!utc && unit != "millisecond") {
 		timeZoneOffset = date.getTimezoneOffset();
@@ -348,7 +354,7 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 			if (count > 1) {
 				hours = Math.floor(hours / count) * count;
 			}
-			date.setUTCHours(hours, 0, 0, 0);
+			date.setUTCHours(hours, roundMinutes, 0, 0);
 
 			break;
 
@@ -372,7 +378,7 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 			}
 
 			date.setUTCMonth(month, 1);
-			date.setUTCHours(0, 0, 0, 0);
+			date.setUTCHours(0, roundMinutes, 0, 0);
 
 			break;
 
@@ -383,7 +389,7 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 				year = Math.floor(year / count) * count;
 			}
 			date.setUTCFullYear(year, 0, 1);
-			date.setUTCHours(0, 0, 0, 0);
+			date.setUTCHours(0, roundMinutes, 0, 0);
 
 			//let nonUTCDateY = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds());
 			//timeZoneOffset = nonUTCDateY.getTimezoneOffset();
@@ -408,10 +414,11 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 			}
 
 			date.setUTCDate(wday);
-			date.setUTCHours(0, 0, 0, 0);
+			date.setUTCHours(0, roundMinutes, 0, 0);
 
 			break;
 	}
+
 	if (!utc && unit != "millisecond") {
 		date.setUTCMinutes(date.getUTCMinutes() + timeZoneOffset);
 
@@ -440,4 +447,18 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 export function setTimezone(date: Date, timezone: string): Date {
 	const d = new Date(date.toLocaleString("en-US", { timeZone: timezone }));
 	return d;
+}
+
+/**
+ * Returns minute fraction of the set timezone.
+ *
+ * @since 4.10.12
+ * @param  timezone  Timezone identifier
+ * @return           Minutes
+ */
+export function getTimezoneMinutes(timezone: string): number {
+	let d = new Date();
+	d.setHours(0, 0, 0, 0);
+	let d2 = setTimezone(d, timezone);
+	return d2.getMinutes();
 }

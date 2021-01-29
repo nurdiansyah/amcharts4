@@ -5,6 +5,38 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [4.10.13] - 2020-12-18
+
+### Added
+- Export: PDF export options now support `scale`, `minWidth`, `minHeight`, `maxWidth`, and `maxHeight` options.
+
+### Changed
+- Setting `ignoreZeroValues = true` on `PieSeries`/`PyramidSeries` will now hide `null`-value slices, too.
+
+### Fixed
+- Inserting a new bullet into an initialized Series will now invalidate it cause the new bullet to appear immediately.
+- Using `timezone` might shift axis label values by one day in some cases.
+- `"i"` input date format was not properly parsing formats with no milliseconds and with timezone offset, e.g. (`"...+10:30"`).
+- Export: `normalizeSVG()` method was producing wrong SVG width/height in output if scale parameter was not being passed in.
+- RangeSelector plugin: "YTD" pre-defined period was not working properly with some data-grouping setups.
+
+
+## [4.10.12] - 2020-11-26
+
+### Changed
+- `DateAxis` setting `timezone` is being deprecated. Please consider setting `timezone` on chart or axis `dateFormatter`. `DateAxis` will now properly place grid in time zones that use non-whole hour fractions, e.g. ("Australia/Adelaide").
+- Accessibility: Roles and tabindexes in `ExportMenu` elements has been altered to better comply with ARIA standards.
+
+### Fixed
+- Scrollbar could act funky when repeatedly clicking on its grips.
+- A minor conflict with Google Charts lib on IE fixed.
+- Improved performance of `ValueAxis` scale calculation.
+- Setting `min` and `max` on a `DateAxis` could result in excessive overzoom and an empty grid in some cases.
+- Overzooming `DateAxis` coul dresult in some extra space shown on it.
+- Legend was dynamically adding items on a Treemap chart when drilling-down.
+- When Legend's labels' `width` were set in percent, they were not being properly sized.
+
+
 ## [4.10.11] - 2020-11-13
 
 ### Added
